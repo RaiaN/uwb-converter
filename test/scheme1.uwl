@@ -1,0 +1,130 @@
+#@UGENE_WORKFLOW
+
+
+
+workflow "First scheme"{
+
+    fetch-sequence {
+        type:fetch-sequence;
+        name:"Загрузить из удаленной базы данных";
+    }
+    get-file-list {
+        type:get-file-list;
+        name:"Список файлов";
+        url-in {
+            dataset:"Dataset 1";
+        }
+    }
+    fetch-das {
+        type:fetch-das;
+        name:"Читать из DAS";
+    }
+    read-annotations {
+        type:read-annotations;
+        name:"Чтение аннотаций";
+        url-in {
+            dataset:"Dataset 1";
+        }
+    }
+    read-variations {
+        type:read-variations;
+        name:"Чтение вариаций";
+        url-in {
+            dataset:"Dataset 1";
+        }
+    }
+    read-sequence {
+        type:read-sequence;
+        name:"Чтение последовательности";
+        url-in {
+            dataset:"Dataset 1";
+        }
+    }
+    read-msa {
+        type:read-msa;
+        name:"Чтение множественного выравнивания";
+        url-in {
+            dataset:"Dataset 1";
+        }
+    }
+    read-assembly {
+        type:read-assembly;
+        name:"Чтение сборки";
+        url-in {
+            dataset:"Dataset 1";
+        }
+    }
+    read-text {
+        type:read-text;
+        name:"Чтение текста";
+        url-in {
+            dataset:"Dataset 1";
+        }
+    }
+
+    .actor-bindings {
+    }
+
+
+    .meta {
+        visual {
+            fetch-das {
+                pos:"-715 -364";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                out-sequence.angle:360;
+            }
+            fetch-sequence {
+                pos:"-724 -642";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                out-sequence.angle:360;
+            }
+            get-file-list {
+                pos:"-714 -480";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                out-url.angle:360;
+            }
+            read-annotations {
+                pos:"-705 -222";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                out-annotations.angle:360;
+            }
+            read-assembly {
+                pos:"-473 -603";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                out-assembly.angle:360;
+            }
+            read-msa {
+                pos:"-692 -17";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                bounds:"-30 -30 120.25 73";
+                out-msa.angle:360;
+            }
+            read-sequence {
+                pos:"-678 111";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                bounds:"-30 -30 91.25 98";
+                out-sequence.angle:360;
+            }
+            read-text {
+                pos:"-540 -493";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                out-text.angle:360;
+            }
+            read-variations {
+                pos:"-701 -117";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                out-variations.angle:360;
+            }
+        }
+    }
+}
+
