@@ -18,7 +18,7 @@ def main():
     converter_obj = converter.Converter(scheme_filename)
     result        = converter_obj.convert()
     
-    with open(scheme_filename[:-4] + ".py", "w") as outp:
+    with open(scheme_filename[:-3], "w" ) as outp:
         outp.write(result)
         
     
