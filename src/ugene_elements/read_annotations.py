@@ -1,4 +1,3 @@
-import os
 import utility
 
 class ReadAnnotatitions:
@@ -22,12 +21,14 @@ class ReadAnnotatitions:
                 line = 'for filename in [%s]:' % (",".join(files)) 
                 code.append(line)
                 
-                line = 'records += [rec for rec in SeqIO.parse(filename, "genbank"):'
+                line = 'ftype = filename.split(".")[-1]'
+                code.append(line)
+                
+                line = 'records += [rec for rec in SeqIO.parse(filename, ftype):'
                 code.append(line)
                 
                 utility.add_end_indentation_line(code)
-        
-        
+                
         self.imports.append("from Bio import SeqIO")
         
         self.code = code

@@ -1,5 +1,5 @@
-import os
 import utility
+
 
 class ReadMSA:
     available_formats = ["aln", "emboss", "fasta", "ig", "nexus", "phy", "sto"]
@@ -7,6 +7,7 @@ class ReadMSA:
     def __init__(self, name, datasets):
         self.name     = name
         self.datasets = datasets 
+        self.imports  = [] 
         
         
     def generate_code(self):
@@ -40,3 +41,6 @@ class ReadMSA:
                 code.append(line)
                 
                 utility.add_end_indentation_line(code) 
+                
+        self.imports.append("from Bio import AlignIO")           
+        self.code = code    
