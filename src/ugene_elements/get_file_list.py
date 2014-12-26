@@ -16,13 +16,11 @@ class GetFileList:
         
         for dataset in datasets:
             name  = dataset[0]
-            files = dataset[1]
-            dirs  = dataset[2]
+            files = dataset[1] + utility.files_from_dirs(dataset[2])
             
-            line  = '[%s, [%s], [%s]]' % (name, ",".join(files), ",".join(dirs))
+            line  = '[%s, [%s]]' % (name, ",".join(files))
             dataset_lines.append(line)
-                 
-        
+                         
         line = 'datasets = [%s]' % (",".join(dataset_lines))
         code.append(line)
         
