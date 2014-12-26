@@ -1,3 +1,5 @@
+import utility
+
 class FetchSequence: 
     dbs = {
           "ensembl": ("ensembl", ), #not supported by BioPython 
@@ -33,8 +35,8 @@ class FetchSequence:
             line = 'seq_record = SeqIO.read(handle, "%s")' % db_rettype[1]
             code.append(line)    
             
-            self.imports.append('from Bio import SeqIO')
-            self.imports.append('from Bio import Entrez')        
+            self.imports.append("from Bio import SeqIO")
+            self.imports.append("from Bio import Entrez")        
         elif db_rettype[0] == "pdb":
             line = 'pdb_downloader = PDBList()'
             code.append(line)
@@ -51,10 +53,9 @@ class FetchSequence:
             line = 'pdb_filenames.append(filename)'
             code.append(line)
             
-            line = "indentation end"
-            code.append(line)     
+            utility.add_end_indentation_line(code)    
             
-            self.imports.append('from Bio import PDB')
+            self.imports.append("from Bio import PDB")
         elif db_rettype[0] == "swiss-prot":
             line = "expasy_records = []"
             code.append(line)
@@ -71,11 +72,10 @@ class FetchSequence:
             line = 'expasy_records.append(record)'
             code.append(line)
             
-            line = "indentation end"
-            code.append(line)   
+            utility.add_end_indentation_line(code)  
             
-            self.imports.append('from Bio import ExPASy')
-            self.imports.append('from Bio import SwissProt')
+            self.imports.append("from Bio import ExPASy")
+            self.imports.append("from Bio import SwissProt")
         elif db_rettype[0] == "uniprot-swiss-prot" or db_rettype[0] == "uniprot-trembl":
             line = "uniprot_records = []"
             code.append(line)
@@ -92,11 +92,10 @@ class FetchSequence:
             line = 'time.sleep(0.3)'
             code.append(line)
             
-            line = "indentation end"
-            code.append(line)
+            utility.add_end_indentation_line(code)
                       
-            self.imports.append('import requests')
-            self.imports.append('import time')
+            self.imports.append("import requests")
+            self.imports.append("import time")
         else:
             raise Exception("Unknown database type")
         
