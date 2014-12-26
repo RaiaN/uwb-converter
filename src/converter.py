@@ -1,6 +1,6 @@
 class Converter:
     WORKFLOW = "workflow"
-    SEMICOLON = '"'
+    QUOTATION = '"'
     
     def __init__(self, scheme_filename):
         with open(self.scheme_filename) as sf:
@@ -25,7 +25,7 @@ class Converter:
     
     
     def parse_for_scheme_name(self):
-        self.scheme_name = self.scheme[0].split(Converter.SEMICOLON)[1] 
+        self.scheme_name = self.scheme[0].split(Converter.QUOTATION)[1] 
         self.scheme = self.scheme[1:]       
     
     
