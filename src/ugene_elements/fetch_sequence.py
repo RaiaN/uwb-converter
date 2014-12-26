@@ -98,4 +98,6 @@ class FetchSequence:
             self.imports.append('import requests')
             self.imports.append('import time')
         else:
-            raise Exception("Unknown database type!")
+            raise Exception("Unknown database type")
+        
+        self.code = code
