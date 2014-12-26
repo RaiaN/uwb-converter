@@ -15,12 +15,11 @@ class GetFileList:
         dataset_lines = []
         
         for dataset in datasets:
-            name = dataset[0]
-            
+            name  = dataset[0]
             files = dataset[1]
             dirs  = dataset[2]
             
-            line = '[%s, [%s], [%s]]' % (name, ",".join(files), ",".join(dirs))
+            line  = '[%s, [%s], [%s]]' % (name, ",".join(files), ",".join(dirs))
             dataset_lines.append(line)
                  
         

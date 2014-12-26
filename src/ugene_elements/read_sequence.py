@@ -33,5 +33,3 @@ class ReadSequence:
         self.imports.append("from Bio import SeqIO")
         
         self.code = code
-        
-                    
