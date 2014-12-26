@@ -11,11 +11,12 @@ class FetchSequence:
           "uniprot-trembl": ("uniprot-trembl", )
           }
      
-    def __init__(self, name, resource_ids, db_name):
+    def __init__(self, name, resource_ids, db_name, elem_id):
         self.name         = name
         self.resource_ids = resource_ids.split(";")
         self.db_name      = db_name
         self.imports      = [] #need to fill it in generate_code
+        self.elem_id      = elem_id
             
     def generate_code(self):
         code = []
@@ -32,16 +33,20 @@ class FetchSequence:
             line = 'handle = Entrez.efetch%1' % params
             code.append(line)
             
-            line = 'seq_record = SeqIO.read(handle, "%s")' % db_rettype[1]
+            self.output = "seq_record%s" % self.elem_id 
+            
+            line = '%s = SeqIO.read(handle, "%s")' % (self.output, db_rettype[1])
             code.append(line)    
             
             self.imports.append("from Bio import SeqIO")
-            self.imports.append("from Bio import Entrez")        
+            self.imports.append("from Bio import Entrez")    
         elif db_rettype[0] == "pdb":
             line = 'pdb_downloader = PDBList()'
             code.append(line)
             
-            line = 'pdb_filenames = []' 
+            self.output = "pdb_filenames%s" % self.elem_id
+            
+            line = '%s = []' % self.output
             code.append(line)
             
             line = 'for id in [%s]:' % ids
@@ -50,14 +55,16 @@ class FetchSequence:
             line = 'filename = pdb_downloader.retrieve_pdb_file(id)'
             code.append(line)
             
-            line = 'pdb_filenames.append(filename)'
-            code.append(line)
+            line = '%s.append(filename)' % self.elem_id
+            code.append(line)            
             
             utility.add_end_indentation_line(code)    
             
             self.imports.append("from Bio import PDB")
         elif db_rettype[0] == "swiss-prot":
-            line = "expasy_records = []"
+            self.output = "expasy_records" + self.elem_id 
+            
+            line = "%s = []" % self.output
             code.append(line)
             
             line = 'for id in [%s]:' % ids
@@ -69,7 +76,7 @@ class FetchSequence:
             line = 'record = SwissProt.read(handle)'
             code.append(line)
             
-            line = 'expasy_records.append(record)'
+            line = '%s.append(record)' % self.output
             code.append(line)
             
             utility.add_end_indentation_line(code)  
@@ -77,7 +84,9 @@ class FetchSequence:
             self.imports.append("from Bio import ExPASy")
             self.imports.append("from Bio import SwissProt")
         elif db_rettype[0] == "uniprot-swiss-prot" or db_rettype[0] == "uniprot-trembl":
-            line = "uniprot_records = []"
+            self.output = "uniprot_records" + self.elem_id
+            
+            line = "%s = []" % self.output
             code.append(line)
             
             line = 'for id in [%s]:' % ids
@@ -86,7 +95,7 @@ class FetchSequence:
             line = 'resp = requests.post("http://www.uniprot.org/uniprot/%s.txt" % id).text'
             code.append(line)
             
-            line = 'uniprot_records.append(record)'
+            line = '%s.append(record)' % self.output
             code.append(line)
             
             line = 'time.sleep(0.3)'

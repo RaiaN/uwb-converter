@@ -12,7 +12,9 @@ class ReadText:
         
         code = []
         
-        line = 'text_data = []'
+        self.output = "text_data" + self.elem_id
+        
+        line = '%s = []' % self.output
         code.append(line)
         
         for dataset in datasets:
@@ -25,7 +27,7 @@ class ReadText:
                 line = 'with open(filename, "r") as text_f:'
                 code.append(line)
                 
-                line = 'text_data += [text_f.readlines()]'
+                line = '%s += [text_f.readlines()]' % self.output
                 code.append(line)
                 
                 utility.add_end_indentation_line(code, count=2)

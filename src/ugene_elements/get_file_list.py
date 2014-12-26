@@ -2,9 +2,10 @@ import utility
 
 
 class GetFileList:
-    def __init__(self, name, datasets):
+    def __init__(self, name, datasets, elem_id):
         self.name     = name
         self.datasets = datasets
+        self.elem_id  = elem_id 
     
         
     def generate_code(self):
@@ -20,8 +21,13 @@ class GetFileList:
             
             line  = '[%s, [%s]]' % (name, ",".join(files))
             dataset_lines.append(line)
+            
+        self.output = 'datasets%s' % str(self.elem_id)      
                          
-        line = 'datasets = [%s]' % (",".join(dataset_lines))
-        code.append(line)
+        line = '%s = [%s]' % (self.output, ",".join(dataset_lines))
+        code.append(line)        
         
         self.code = code
+        
+    def get_output_name(self):
+        return self.output        

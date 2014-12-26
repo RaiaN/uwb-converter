@@ -11,7 +11,9 @@ class ReadVariations:
         
         code = []
         
-        line = 'vcf_data = []'
+        self.output = "vcf_data" + self.elem_id
+        
+        line = '%s = []' % self.output
         code.append(line)
         
         for dataset in datasets:
@@ -27,7 +29,7 @@ class ReadVariations:
                 line = 'vdata = vcf_f.readlines()'
                 code.append(line)
                 
-                line = 'vcf_data.append(vdata)'
+                line = '%s.append(vdata)' % self.output 
                 code.append(line) 
             
                 utility.add_end_indentation_line(code, count=2)

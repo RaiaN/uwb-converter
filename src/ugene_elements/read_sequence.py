@@ -2,17 +2,20 @@ import utility
 
 
 class ReadSequence:
-    def __init__(self, name, datasets):
+    def __init__(self, name, datasets, elem_id):
         self.name     = name
         self.datasets = datasets
         self.imports  = []
+        self.elem_id  = elem_id
         
     def generate_code(self):
         datasets = utility.prepare_datasets(self.datasets)
         
         code = []
         
-        line = 'seq_records = []'
+        self.output = "seq_records" + self.elem_id
+        
+        line = '%s = []' % self.output
         code.append(line)
         
         for dataset in datasets:
@@ -25,7 +28,7 @@ class ReadSequence:
                 line = 'ftype = filename.split(".")[-1]'
                 code.append(line)
                 
-                line = 'seq_records += [rec for rec in SeqIO.parse(filename, ftype):'
+                line = '%s += [rec for rec in SeqIO.parse(filename, ftype):' % self.output
                 code.append(line)
                 
                 utility.add_end_indentation_line(code)
