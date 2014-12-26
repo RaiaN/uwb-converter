@@ -1,3 +1,5 @@
+import os
+
 def prepare_datasets(datasets):   
     good_datasets = []
     
@@ -24,3 +26,17 @@ def prepare_datasets(datasets):
 
 def add_end_indentation_line(code, count=1):  
     code += ["indentation end"] * count      
+    
+    
+def files_from_dirs(dirs):
+    files = []
+    
+    for dirpath in dirs:
+        if not dirpath.endswith("/"):
+            dirpath += "/"
+            
+        for fname in os.listdir(dirpath):
+            if os.path.isfile(fname):
+                files.append(dirpath + fname)
+        
+    return files
