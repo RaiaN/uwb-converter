@@ -19,4 +19,8 @@ def prepare_datasets(datasets):
                 
         good_datasets.append([name, files, dirs]) 
         
-    return good_datasets               
+    return good_datasets       
+
+
+def add_end_indentation_line(code, count=1):  
+    code += ["indentation end"] * count      
