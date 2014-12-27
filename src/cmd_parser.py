@@ -7,7 +7,7 @@ def create():
     return parser
 
 def usage():
-    print('Please, use -s option to set UGENE workflow scheme, e.g. "-s test.uwl"')
+    print('Please, use -scheme option to set UGENE workflow scheme, e.g. "-scheme test.uwl"')
     
 
 def get_args(parser):

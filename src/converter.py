@@ -79,16 +79,19 @@ class Converter:
       
       
     def parse_for_description(self):
-        self.descr = ""
+        self.descr = []
         
         ind = 0 
         cl = self.scheme[ind].lstrip()
         
         while not cl.startswith(Converter.WORKFLOW):
-            self.descr += self.scheme[ind]    
+            if len(self.scheme[ind].strip()) > 0:
+                self.descr += [self.scheme[ind]]  
             
             ind += 1
             cl = self.scheme[ind].lstrip()
+            
+        self.descr += [""]    
         
         self.scheme = self.scheme[ind:]
     
@@ -361,6 +364,8 @@ class Converter:
     
     
     def build_biopython_workflow(self):
+        code = ["'''"] + [self.scheme_name] + self.descr + ["'''"]
+        
         imports = []
         body    = []    
         
@@ -385,6 +390,6 @@ class Converter:
             
             first = False
          
-        code = list(set(imports)) + [""] + body
+        code += list(set(imports)) + [""] + body
               
         self.generated_code = code

@@ -7,13 +7,13 @@ import converter
 
 def main():
     parser_obj = cmd_parser.create()
-    args       = cmd_parser.get_args(parser_obj)    
+    arg       = cmd_parser.get_args(parser_obj)    
     
-    if args == None:
+    if arg == None:
         cmd_parser.usage()
         return 0
     
-    scheme_filename = parser_obj.scheme
+    scheme_filename = arg
     
     converter_obj = converter.Converter(scheme_filename)
     code = converter_obj.convert()
