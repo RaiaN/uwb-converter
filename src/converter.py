@@ -15,6 +15,8 @@ from write_sequence import WriteSequence
 from write_text import WriteText
 from write_variations import WriteVariations 
 
+from merge_fastq import MergeFASTQ 
+from sequence_translation import SequenceTranslation  
 
 class Converter:
     WORKFLOW = "workflow"
@@ -38,10 +40,16 @@ class Converter:
     WRITE_VARIATIONS  = "write-variations"
     WRITE_TEXT        = "write-text"
     
+    MERGE_FASTQ       = "MergeFastq"
+    
+    SEQUENCE_TRANSLATION = "sequence-translation"
+    REVERSE_COMPLEMENT   = "reverse-complement"
+    
     writers = [WRITE_ANNOTATIONS, WRITE_FASTA, WRITE_MSA,
                WRITE_SEQUENCE, WRITE_VARIATIONS, WRITE_TEXT] 
     
-    ALL = readers + writers + [FETCH_SEQUENCE] 
+    ALL = readers + writers + [FETCH_SEQUENCE, MERGE_FASTQ, 
+                               SEQUENCE_TRANSLATION, REVERSE_COMPLEMENT] 
     
     
     def __init__(self, scheme_filename):
@@ -89,10 +97,7 @@ class Converter:
             cl = self.scheme[ind]  
             
             if cl.lstrip().startswith(".actor-bindings"):
-                while "}" not in cl:
-                    ind += 1                    
-                    cl = self.scheme[ind]  
-                    
+                ind += 1               
                 break
             
             if "{" not in cl:
@@ -208,7 +213,45 @@ class Converter:
                     w_elem = WriteVariations(elem_name, url_out, elem_id, true_elem_name) 
                     
                 self.workflow_elems.append(w_elem)     
-                elem_id += 1            
+                elem_id += 1  
+                
+            elif elem == Converter.MERGE_FASTQ:
+                while line != "}":
+                    if line.startswith("name"):
+                        elem_name = line.split(':')[-1].strip(';"')
+                                     
+                    ind += 1 
+                    line = self.scheme[ind].strip()
+                
+                w_elem = MergeFASTQ(elem_name, elem_id, true_elem_name)
+                
+                self.workflow_elems.append(w_elem)     
+                elem_id += 1 
+                        
+            elif elem == Converter.SEQUENCE_TRANSLATION:
+                while line != "}":
+                    if line.startswith("name"):
+                        elem_name = line.split(':')[-1].strip(';"')
+                                     
+                    ind += 1 
+                    line = self.scheme[ind].strip()
+                
+                w_elem = SequenceTranslation(elem_name, elem_id, true_elem_name)
+                 
+                self.workflow_elems.append(w_elem)     
+                elem_id += 1  
+            elif elem == Converter.REVERSE_COMPLEMENT:
+                while line != "}":
+                    if line.startswith("name"):
+                        elem_name = line.split(':')[-1].strip(';"')
+                                     
+                    ind += 1 
+                    line = self.scheme[ind].strip() 
+                    
+                w_elem = SequenceTranslation(elem_name, elem_id, true_elem_name)
+                 
+                self.workflow_elems.append(w_elem)     
+                elem_id += 1              
         
         self.scheme = self.scheme[ind:]
               
@@ -221,12 +264,16 @@ class Converter:
         while ind < len(self.scheme):
             cl = self.scheme[ind].strip()
             
-            if cl.startswith(".meta"):
+            if "}" in cl:
                 break                
         
             if "->" in cl:
                 sequence = [elem.split('.')[0] for elem in cl.split("->")]    
-                workflows.append(sequence)
+                
+                if len(workflows) > 0 and sequence[0] == workflows[-1][-1]:
+                    workflows[-1].append(sequence[-1]) 
+                else:
+                    workflows.append(sequence)
                 
             ind += 1
          
