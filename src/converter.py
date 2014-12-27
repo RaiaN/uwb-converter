@@ -1,4 +1,6 @@
 import re
+from _collections import deque
+
 from fetch_sequence import FetchSequence
 
 from get_file_list import GetFileList
@@ -19,6 +21,8 @@ from merge_fastq import MergeFASTQ
 from sequence_translation import SequenceTranslation  
 from reverse_complement import ReverseComplement
 from dna_stats import DNAStats
+from convert_alignment_to_sequence import ConvertAlignmentToSequence 
+
 
 
 class Converter:
@@ -47,13 +51,16 @@ class Converter:
     
     SEQUENCE_TRANSLATION = "sequence-translation"
     REVERSE_COMPLEMENT   = "reverse-complement"
-    DNA_STATS            = "gc-content"
+    DNA_STATS            = "dna-stats"
+    
+    CONVERT_ALIGNMENT_TO_SEQUENCE = "convert-alignment-to-sequence"
     
     writers = [WRITE_ANNOTATIONS, WRITE_FASTA, WRITE_MSA,
                WRITE_SEQUENCE, WRITE_VARIATIONS, WRITE_TEXT] 
     
-    ALL = readers + writers + [FETCH_SEQUENCE, MERGE_FASTQ, SEQUENCE_TRANSLATION, 
-                               REVERSE_COMPLEMENT, DNA_STATS] 
+    ALL = readers + writers + [FETCH_SEQUENCE, MERGE_FASTQ, 
+                               SEQUENCE_TRANSLATION, REVERSE_COMPLEMENT, 
+                               DNA_STATS, CONVERT_ALIGNMENT_TO_SEQUENCE] 
     
     
     def __init__(self, scheme_filename):
@@ -244,6 +251,7 @@ class Converter:
                  
                 self.workflow_elems.append(w_elem)     
                 elem_id += 1  
+                
             elif elem == Converter.REVERSE_COMPLEMENT:
                 while line != "}":
                     if line.startswith("name"):
@@ -255,7 +263,8 @@ class Converter:
                 w_elem = ReverseComplement(elem_name, elem_id, true_elem_name)
                  
                 self.workflow_elems.append(w_elem)     
-                elem_id += 1      
+                elem_id += 1     
+                 
             elif elem == Converter.DNA_STATS:
                 while line != "}":
                     if line.startswith("name"):
@@ -267,16 +276,53 @@ class Converter:
                 w_elem = DNAStats(elem_name, elem_id, true_elem_name)
                  
                 self.workflow_elems.append(w_elem)     
-                elem_id += 1       
-                        
+                elem_id += 1     
+                  
+            elif elem == Converter.CONVERT_ALIGNMENT_TO_SEQUENCE:
+                while line != "}":
+                    if line.startswith("name"):
+                        elem_name = line.split(':')[-1].strip(';"')
+                                     
+                    ind += 1 
+                    line = self.scheme[ind].strip() 
+                    
+                w_elem = ConvertAlignmentToSequence(elem_name, elem_id, true_elem_name)
+                 
+                self.workflow_elems.append(w_elem)     
+                elem_id += 1                  
         
         self.scheme = self.scheme[ind:]
               
-    
+   
+    def topological_sort(self, adj_list): # to determine correct order of elements in code
+        order = deque()
+        enter = set([i for i in range(len(adj_list))])
+        visited = [False] * len(adj_list) 
+ 
+        def dfs(v):
+            visited[v] = True
+            
+            for av in adj_list[v]:
+                if not visited[av]:
+                    enter.discard(av)
+                    dfs(av)
+            
+            order.appendleft(v)
+ 
+        while enter: 
+            dfs(enter.pop())
+        
+        return order
+
+
     def parse_for_workflows(self):
         ind = 0
         
-        workflows = [] 
+        edges   = [] 
+        ids     = {}
+        nodes   = {} 
+        
+        node_id = 0
         
         while ind < len(self.scheme):
             cl = self.scheme[ind].strip()
@@ -285,50 +331,59 @@ class Converter:
                 break                
         
             if "->" in cl:
-                sequence = [elem.split('.')[0] for elem in cl.split("->")]    
+                edge = [elem.split('.')[0] for elem in cl.split("->")] 
                 
-                if len(workflows) > 0 and (sequence[0] in workflows[-1]): 
-                    workflows[-1].append(sequence[-1]) #continue workflow 
-                else:
-                    workflows.append(sequence)
+                for node in edge:
+                    if node not in ids.keys():
+                        ids[node]      = node_id
+                        nodes[node_id] = node
+                        node_id += 1       
+                
+                edges.append(edge) 
                 
             ind += 1
-         
-        self.workflows = workflows    
+            
+        adj_list = [[] for i in range(node_id)]
+        
+        prev_nodes = {}
+        
+        for edge in edges:
+            u = ids[edge[0]]
+            v = ids[edge[1]]
+            
+            adj_list[u].append(v)    
+            prev_nodes[edge[1]] = edge[0] 
+             
+        order = self.topological_sort(adj_list)     
+            
+        self.workflow   = [nodes[id] for id in order]
+        self.prev_nodes = prev_nodes 
     
     
     def build_biopython_workflow(self):
         imports = []
         body    = []    
         
-        all_elems = self.workflow_elems
+        elems = self.workflow_elems
+        elems_names = [elem.true_elem_name for elem in self.workflow_elems]
         
-        for workflow in self.workflows:
-            prev_elem = None
+        first = True
             
-            for w_elem in workflow:
-                for elem in self.workflow_elems:
-                    if elem.true_elem_name == w_elem:
-                        if prev_elem is not None:
-                            elem.input_data = prev_elem.output
-                        
-                        if elem in all_elems:
-                            all_elems.remove(elem)
-                        
-                        elem.generate_code()
-                        
-                        body    += elem.code
-                        imports += elem.imports
-                        
-                        prev_elem = elem
-                        
-                        break                 
-                
-        for elem in all_elems:
-            elem.generate_code()
+        for w_elem_name in self.workflow:
+            curr_elem = elems[elems_names.index(w_elem_name)]
             
-            body += elem.code
-            imports += elem.imports 
+            if not first and w_elem_name in self.prev_nodes.keys():
+                prev_elem_name = self.prev_nodes[w_elem_name]
+                prev_elem = elems[elems_names.index(prev_elem_name)] 
+                                       
+                curr_elem.input_data = prev_elem.output
+            
+            curr_elem.generate_code()
+            
+            body    += curr_elem.code
+            imports += curr_elem.imports
+            
+            first = False
          
         code = list(set(imports)) + [""] + body
               
