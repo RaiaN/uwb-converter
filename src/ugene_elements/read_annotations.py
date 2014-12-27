@@ -1,6 +1,6 @@
 import utility
 
-class ReadAnnotatitions:
+class ReadAnnotations:
     def __init__(self, name, datasets, elem_id):
         self.name     = name
         self.datasets = datasets

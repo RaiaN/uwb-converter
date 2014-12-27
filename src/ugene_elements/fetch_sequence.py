@@ -1,5 +1,6 @@
 import utility
 
+
 class FetchSequence: 
     dbs = {
           "ensembl": ("ensembl", ), #not supported by BioPython 
