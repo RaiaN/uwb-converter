@@ -24,6 +24,13 @@ class FetchSequence:
         db_rettype = FetchSequence.dbs[self.db_name] 
         ids = ",".join(self.resource_ids)
         
+        if len(ids) == 0:
+            self.code = code
+            return 
+        
+        line = "# " + self.name
+        code.append(line)
+        
         if db_rettype[0] == "ensembl":
             raise NotImplementedError
         elif db_rettype[0] == "nuccore" or db_rettype[0] == "protein":
@@ -31,7 +38,7 @@ class FetchSequence:
             code.append(line)
             
             params = '(db="%s", id="%s", rettype="%s", retmode="text")' % (db_rettype[0], ids, db_rettype[1])
-            line = 'handle = Entrez.efetch%1' % params
+            line = 'handle = Entrez.efetch%s' % params
             code.append(line)
             
             self.output = "seq_record%s" % self.elem_id 
@@ -50,6 +57,8 @@ class FetchSequence:
             line = '%s = []' % self.output
             code.append(line)
             
+            ids = ['"' + id + '"' for id in ids] 
+            
             line = 'for id in [%s]:' % ids
             code.append(line)                
             
@@ -67,6 +76,8 @@ class FetchSequence:
             
             line = "%s = []" % self.output
             code.append(line)
+            
+            ids = ['"' + id + '"' for id in ids] 
             
             line = 'for id in [%s]:' % ids
             code.append(line)  
@@ -90,6 +101,8 @@ class FetchSequence:
             line = "%s = []" % self.output
             code.append(line)
             
+            ids = ['"' + id + '"' for id in ids] 
+            
             line = 'for id in [%s]:' % ids
             code.append(line)  
             
@@ -108,5 +121,7 @@ class FetchSequence:
             self.imports.append("import time")
         else:
             raise Exception("Unknown database type")
+        
+        utility.add_empty_line(code)
         
         self.code = code

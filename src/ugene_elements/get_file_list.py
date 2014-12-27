@@ -6,6 +6,7 @@ class GetFileList:
         self.name     = name
         self.datasets = datasets
         self.elem_id  = elem_id 
+        self.imports  = []
     
         
     def generate_code(self):
@@ -19,15 +20,25 @@ class GetFileList:
             name  = dataset[0]
             files = dataset[1] + utility.files_from_dirs(dataset[2])
             
-            line  = '[%s, [%s]]' % (name, ",".join(files))
-            dataset_lines.append(line)
+            if len(files) > 0:
+                files = ['"' + file + '"' for file in files] 
+                
+                line  = '["%s", [%s]]' % (name, ",".join(files))
+                dataset_lines.append(line)
             
         self.output = 'datasets%s' % str(self.elem_id)      
-                         
-        line = '%s = [%s]' % (self.output, ",".join(dataset_lines))
-        code.append(line)        
+        
+        if len(dataset_lines) > 0:  
+            line = "# " + self.name
+            code.append(line)
+                            
+            line = '%s = [%s]' % (self.output, ",".join(dataset_lines))
+            code.append(line)
+            
+        utility.add_empty_line(code)            
         
         self.code = code
+        
         
     def get_output_name(self):
         return self.output        
