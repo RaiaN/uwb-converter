@@ -143,40 +143,25 @@ class Converter:
                     line = self.scheme[ind].strip()  
                  
                 if elem == Converter.GET_FILE_LIST:
-                    gfl = GetFileList(elem_name, datasets, elem_id)    
+                    w_elem = GetFileList(elem_name, datasets, elem_id) 
                     
-                    self.workflow_elems.append(gfl)     
-                    elem_id += 1    
-                
                 elif elem == Converter.READ_ANNOTATIONS: 
-                    rann = ReadAnnotations(elem_name, datasets, elem_id)    
-                    
-                    self.workflow_elems.append(rann)     
-                    elem_id += 1
+                    w_elem = ReadAnnotations(elem_name, datasets, elem_id)
                     
                 elif elem == Converter.READ_MSA:
-                    rmsa = ReadMSA(elem_name, datasets, elem_id)    
-                    
-                    self.workflow_elems.append(rmsa)     
-                    elem_id += 1
+                    w_elem = ReadMSA(elem_name, datasets, elem_id) 
                     
                 elif elem == Converter.READ_SEQUENCE:
-                    rseq = ReadSequence(elem_name, datasets, elem_id)    
-                    
-                    self.workflow_elems.append(rseq)     
-                    elem_id += 1
+                    w_elem = ReadSequence(elem_name, datasets, elem_id)
                     
                 elif elem == Converter.READ_TEXT:
-                    rtext = ReadText(elem_name, datasets, elem_id)    
-                    
-                    self.workflow_elems.append(rtext)     
-                    elem_id += 1
+                    w_elem = ReadText(elem_name, datasets, elem_id)  
                     
                 elif elem == Converter.READ_VARIATIONS:  
-                    rvar = ReadVariations(elem_name, datasets, elem_id)    
+                    w_elem = ReadVariations(elem_name, datasets, elem_id)  
                     
-                    self.workflow_elems.append(rvar)     
-                    elem_id += 1   
+                self.workflow_elems.append(w_elem)     
+                elem_id += 1        
             elif elem in Converter.writers:
                 pass    
         
