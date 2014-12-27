@@ -22,7 +22,7 @@ class WriteFasta:
         line = '# ' + self.name
         code.append(line)
         
-        line = 'with open(%s, "w") as outp_f:' % (self.output_dir + self.output_path)
+        line = 'with open("%s", "w") as outp_f:' % (self.output_dir + self.output_path)
         code.append(line)
         
         line = 'SeqIO.write(%s, outp_f, "fasta")' % (self.input_data) 

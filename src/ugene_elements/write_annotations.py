@@ -15,14 +15,14 @@ class WriteAnnotations:
     def generate_code(self):
         code = []
         
-        if self.input_data is None:
+        if self.input_data is None or self.output_path is None:
             self.code = code
             return
         
         line = '# ' + self.name
         code.append(line)
         
-        line = 'with open(%s, "w") as outp_f:' % (self.output_dir + self.output_path)
+        line = 'with open("%s", "w") as outp_f:' % (self.output_dir + self.output_path)
         code.append(line)
         
         line = 'SeqIO.write(%s, outp_f, "gb")' % (self.input_data) 
