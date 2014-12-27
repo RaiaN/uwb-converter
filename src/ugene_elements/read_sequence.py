@@ -2,11 +2,13 @@ import utility
 
 
 class ReadSequence:
-    def __init__(self, name, datasets, elem_id):
+    def __init__(self, name, datasets, elem_id, true_elem_name):
         self.name     = name
         self.datasets = datasets
         self.imports  = []
         self.elem_id  = elem_id
+        self.true_elem_name = true_elem_name
+        
         
     def generate_code(self):
         datasets = utility.prepare_datasets(self.datasets)

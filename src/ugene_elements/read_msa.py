@@ -4,11 +4,12 @@ import utility
 class ReadMSA:
     available_formats = ["aln", "emboss", "fasta", "ig", "nexus", "phy", "sto"]
     
-    def __init__(self, name, datasets, elem_id):
+    def __init__(self, name, datasets, elem_id, true_elem_name):
         self.name     = name
         self.datasets = datasets 
         self.imports  = [] 
         self.elem_id  = elem_id 
+        self.true_elem_name = true_elem_name
         
         
     def generate_code(self):

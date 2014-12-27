@@ -12,12 +12,14 @@ class FetchSequence:
           "uniprot-trembl": ("uniprot-trembl", )
           }
      
-    def __init__(self, name, resource_ids, db_name, elem_id):
+    def __init__(self, name, resource_ids, db_name, elem_id, true_elem_name):
         self.name         = name
         self.resource_ids = resource_ids.split(";")
         self.db_name      = db_name
         self.imports      = [] #need to fill it in generate_code
         self.elem_id      = elem_id
+        self.true_elem_name = true_elem_name
+            
             
     def generate_code(self):
         code = []

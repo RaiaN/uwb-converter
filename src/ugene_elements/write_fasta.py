@@ -2,13 +2,15 @@ import utility
 
 
 class WriteFasta:
-    def __init__(self, name, output_path, elem_id):
+    def __init__(self, name, output_path, elem_id, true_elem_name):
         self.name = name        
         self.input_data = None
         self.output_path = output_path
         self.elem_id = elem_id
         self.output_dir = "biopython_data/"
         self.imports = []
+        self.true_elem_name = true_elem_name
+        
         
     def generate_code(self):
         code = []

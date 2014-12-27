@@ -2,11 +2,12 @@ import utility
 
 
 class GetFileList:
-    def __init__(self, name, datasets, elem_id):
+    def __init__(self, name, datasets, elem_id, true_elem_name):
         self.name     = name
         self.datasets = datasets
         self.elem_id  = elem_id 
         self.imports  = []
+        self.true_elem_name = true_elem_name
     
         
     def generate_code(self):
