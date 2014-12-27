@@ -41,6 +41,8 @@ class Converter:
     writers = [WRITE_ANNOTATIONS, WRITE_FASTA, WRITE_MSA,
                WRITE_SEQUENCE, WRITE_VARIATIONS, WRITE_TEXT] 
     
+    ALL = readers + writers + [FETCH_SEQUENCE] 
+    
     
     def __init__(self, scheme_filename):
         with open(scheme_filename) as sf:
@@ -51,7 +53,7 @@ class Converter:
         self.parse_for_description()
         self.parse_for_scheme_name()
         self.parse_for_elements()
-        self.parse_for_workflow()
+        self.parse_for_workflows()
         self.build_biopython_workflow()
             
         return self.generated_code
@@ -81,26 +83,30 @@ class Converter:
         ind = 0
         
         self.workflow_elems = []
-        elem_id        = 0
+        elem_id = 0
         
         while ind < len(self.scheme):
-            cl   = self.scheme[ind]  
+            cl = self.scheme[ind]  
             
             if cl.lstrip().startswith(".actor-bindings"):
-                self.scheme = self.scheme[ind:]
+                while "}" not in cl:
+                    ind += 1                    
+                    cl = self.scheme[ind]  
+                    
                 break
             
             if "{" not in cl:
                 ind += 1
                 continue
             
-            line = cl[:cl.index("{")].strip()
+            line = cl.split('{')[0].strip()
+            true_elem_name = line
             
             numeric = re.compile(r'[\d]+')
             line    = numeric.sub('', line)
-            elem    = line.rstrip("-")
+            elem    = line.rstrip("-") #elem name without numbers
             
-            if elem not in Converter.elements:
+            if elem not in Converter.ALL:
                 print("Element %s is not supported yet")
                 ind += 1
                 continue    
@@ -122,7 +128,7 @@ class Converter:
                     ind += 1 
                     line = self.scheme[ind].strip()    
                 
-                fs = FetchSequence(elem_name, resource_ids, db_name, elem_id)    
+                fs = FetchSequence(elem_name, resource_ids, db_name, elem_id, true_elem_name)    
                 
                 self.workflow_elems.append(fs)     
                 elem_id += 1    
@@ -151,22 +157,22 @@ class Converter:
                     line = self.scheme[ind].strip()  
                  
                 if elem == Converter.GET_FILE_LIST:
-                    w_elem = GetFileList(elem_name, datasets, elem_id) 
+                    w_elem = GetFileList(elem_name, datasets, elem_id, true_elem_name) 
                     
                 elif elem == Converter.READ_ANNOTATIONS: 
-                    w_elem = ReadAnnotations(elem_name, datasets, elem_id)
+                    w_elem = ReadAnnotations(elem_name, datasets, elem_id, true_elem_name)
                     
                 elif elem == Converter.READ_MSA:
-                    w_elem = ReadMSA(elem_name, datasets, elem_id) 
+                    w_elem = ReadMSA(elem_name, datasets, elem_id, true_elem_name) 
                     
                 elif elem == Converter.READ_SEQUENCE:
-                    w_elem = ReadSequence(elem_name, datasets, elem_id)
+                    w_elem = ReadSequence(elem_name, datasets, elem_id, true_elem_name)
                     
                 elif elem == Converter.READ_TEXT:
-                    w_elem = ReadText(elem_name, datasets, elem_id)  
+                    w_elem = ReadText(elem_name, datasets, elem_id, true_elem_name)  
                     
                 elif elem == Converter.READ_VARIATIONS:  
-                    w_elem = ReadVariations(elem_name, datasets, elem_id)  
+                    w_elem = ReadVariations(elem_name, datasets, elem_id, true_elem_name)  
                     
                 self.workflow_elems.append(w_elem)     
                 elem_id += 1      
@@ -184,22 +190,22 @@ class Converter:
                     line = self.scheme[ind].strip()  
                     
                 if elem == Converter.WRITE_ANNOTATIONS:
-                    w_elem = WriteAnnotations(elem_name, url_out, elem_id) 
+                    w_elem = WriteAnnotations(elem_name, url_out, elem_id, true_elem_name) 
                     
                 elif elem == Converter.WRITE_FASTA: 
-                    w_elem = WriteFasta(elem_name, url_out, elem_id) 
+                    w_elem = WriteFasta(elem_name, url_out, elem_id, true_elem_name) 
                     
                 elif elem == Converter.WRITE_MSA:
-                    w_elem = WriteMSA(elem_name, url_out, elem_id)  
+                    w_elem = WriteMSA(elem_name, url_out, elem_id, true_elem_name)  
                     
                 elif elem == Converter.WRITE_SEQUENCE:
-                    w_elem = WriteSequence(elem_name, url_out, elem_id) 
+                    w_elem = WriteSequence(elem_name, url_out, elem_id, true_elem_name) 
                     
                 elif elem == Converter.WRITE_TEXT:
-                    w_elem = WriteText(elem_name, url_out, elem_id)  
+                    w_elem = WriteText(elem_name, url_out, elem_id, true_elem_name)  
                     
                 elif elem == Converter.WRITE_VARIATIONS:  
-                    w_elem = WriteVariations(elem_name, url_out, elem_id) 
+                    w_elem = WriteVariations(elem_name, url_out, elem_id, true_elem_name) 
                     
                 self.workflow_elems.append(w_elem)     
                 elem_id += 1            
@@ -207,21 +213,58 @@ class Converter:
         self.scheme = self.scheme[ind:]
               
     
-    def parse_for_workflow(self):
-        pass
+    def parse_for_workflows(self):
+        ind = 0
         
+        workflows = [] 
+        
+        while ind < len(self.scheme):
+            cl = self.scheme[ind].strip()
+            
+            if cl.startswith(".meta"):
+                break                
+        
+            if "->" in cl:
+                sequence = [elem.split('.')[0] for elem in cl.split("->")]    
+                workflows.append(sequence)
+                
+            ind += 1
+         
+        self.workflows = workflows    
     
     def build_biopython_workflow(self):
         imports = []
+        body    = []    
         
-        body = [] #only one import for all cases      
+        all_elems = self.workflow_elems
         
-        for elem in self.workflow_elems:
+        for workflow in self.workflows:
+            prev_elem = None
+            
+            for w_elem in workflow:
+                for elem in self.workflow_elems:
+                    if elem.true_elem_name == w_elem:
+                        if prev_elem is not None:
+                            elem.input_data = prev_elem.output
+                        
+                        if elem in all_elems:
+                            all_elems.remove(elem)
+                        
+                        elem.generate_code()
+                        
+                        body    += elem.code
+                        imports += elem.imports
+                        
+                        prev_elem = elem
+                        
+                        break                 
+                
+        for elem in all_elems:
             elem.generate_code()
             
             body += elem.code
             imports += elem.imports 
          
-        imports = list(set(imports)) + [""]
+        code = list(set(imports)) + [""] + body
               
-        self.generated_code = imports + body
+        self.generated_code = code
