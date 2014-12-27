@@ -6,6 +6,8 @@ Entrez.email = "Put your email here (for Entrez)"
 handle = Entrez.efetch(db="nuccore", id="ewqe", rettype="gb", retmode="text")
 seq_record0 = SeqIO.read(handle, "gb")
 
+# Список файлов
+datasets1 = [["Dataset 1", ["/home/raian/flux/fluxgui.svg","/home/raian/flux/MANIFEST.in","/home/raian/flux/README"]]]
 
 records2 = []
 # Чтение аннотаций Dataset 1

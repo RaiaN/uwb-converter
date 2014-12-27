@@ -1,7 +1,7 @@
 import utility
 
 
-class WriteFasta:
+class WriteSequence:
     def __init__(self, name, input_data, output_path, elem_id):
         self.name = name        
         self.input_data = input_data

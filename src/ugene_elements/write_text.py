@@ -23,13 +23,18 @@ class WriteText:
         line = 'with open(%s, "w") as outp_f:' % (self.output_dir + self.output_path)
         code.append(line)
         
-        line = 'for line in %s' % self.input_data
+        line = 'for line in %s:' % self.input_data
         code.append(line)
         
         line = 'outp_f.write(line + "\n")'
         code.append(line)
         
-        utility.add_end_indentation_line(code, count=2)
+        utility.add_end_indentation_line(code)
+        
+        line = 'outp_f.write("\n")'
+        code.append(line)
+               
+        utility.add_end_indentation_line(code)
         utility.add_empty_line(code)
                        
         self.code = code    
