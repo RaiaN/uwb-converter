@@ -17,13 +17,12 @@ class GetFileList:
         dataset_lines = []
         
         for dataset in datasets:
-            name  = dataset[0]
             files = dataset[1] + utility.files_from_dirs(dataset[2])
             
             if len(files) > 0:
                 files = ['"' + file + '"' for file in files] 
                 
-                line  = '["%s", [%s]]' % (name, ",".join(files))
+                line  = '[%s]' % (",".join(files))
                 dataset_lines.append(line)
             
         self.output = 'datasets%s' % str(self.elem_id)      

@@ -12,6 +12,7 @@ class Converter:
     WORKFLOW = "workflow"
     
     FETCH_SEQUENCE   = "fetch-sequence"
+    
     GET_FILE_LIST    = "get-file-list"
     READ_ANNOTATIONS = "read-annotations"
     READ_MSA         = "read-msa"
@@ -19,10 +20,19 @@ class Converter:
     READ_TEXT        = "read-text"
     READ_VARIATIONS  = "read-variations" 
     
-    elements = [FETCH_SEQUENCE, GET_FILE_LIST,
-                READ_ANNOTATIONS, READ_MSA,
-                READ_SEQUENCE, READ_TEXT, 
-                READ_VARIATIONS] 
+    readers = [READ_ANNOTATIONS, READ_MSA, READ_SEQUENCE, 
+               READ_TEXT, READ_VARIATIONS]
+    
+    WRITE_ANNOTATIONS = "write-annotations"
+    WRITE_FASTA       = "write-fasta"
+    WRITE_MSA         = "write-msa"
+    WRITE_SEQUENCE    = "write-sequence"
+    WRITE_VARIATIONS  = "write-variations"
+    WRITE_TEXT        = "write-text"
+    
+    writers = [WRITE_ANNOTATIONS, WRITE_FASTA, WRITE_MSA,
+               WRITE_SEQUENCE, WRITE_VARIATIONS, WRITE_TEXT] 
+    
     
     def __init__(self, scheme_filename):
         with open(scheme_filename) as sf:
@@ -109,7 +119,7 @@ class Converter:
                 self.workflow_elems.append(fs)     
                 elem_id += 1    
                         
-            elif elem in Converter.elements[1:]: #common for all except FETCH_SEQUENCE 
+            elif elem in Converter.readers:
                 datasets = []
                 
                 while line != "}":
@@ -167,6 +177,8 @@ class Converter:
                     
                     self.workflow_elems.append(rvar)     
                     elem_id += 1   
+            elif elem in Converter.writers:
+                pass    
         
         self.scheme = self.scheme[ind:]
               
