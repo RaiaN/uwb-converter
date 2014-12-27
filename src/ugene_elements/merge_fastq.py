@@ -21,7 +21,7 @@ class MergeFASTQ:
         line = '# ' + self.name
         code.append(line)
         
-        line = 'with open("%s", "w") as outp_f:' % (self.output_dir + self.output_path + "_merged")
+        line = 'with open("%s", "w") as outp_f:' % (self.output_dir + "_fastq_merged")
         code.append(line)
         
         line = 'SeqIO.write(%s, outp_f, "fastq")' % (self.input_data) 
