@@ -1,15 +1,77 @@
 #@UGENE_WORKFLOW
 
 
-
 workflow "First scheme"{
 
+    fetch-sequence {
+        type:fetch-sequence;
+        name:"Загрузить из удаленной базы данных";
+        resource-id:ewqe;
+    }
+    get-file-list {
+        type:get-file-list;
+        name:"Список файлов";
+        url-in {
+            dataset:"Dataset 1";
+        }
+    }
+    read-annotations {
+        type:read-annotations;
+        name:"Чтение аннотаций";
+        url-in {
+            dataset:"Dataset 1";
+            file:/home/raian/eqwe.uwl;
+            file:/home/raian/nohup.out;
+            file:"/home/raian/System Report.txt";
+            dir:/home/raian/eclipse;
+        }
+        url-in {
+            dataset:"Dataset 2";
+            dir:/home/raian/eclipse/p2;
+            file:/home/raian/algo-hw-4.pdf;
+        }
+    }
+    read-variations {
+        type:read-variations;
+        name:"Чтение вариаций";
+        url-in {
+            dataset:"Dataset 1";
+        }
+    }
+    read-msa {
+        type:read-msa;
+        name:"Чтение множественного выравнивания";
+        url-in {
+            dataset:"Dataset 1";
+        }
+    }
+    read-sequence {
+        type:read-sequence;
+        name:"Чтение последовательности";
+        url-in {
+            dataset:"Dataset 1";
+        }
+    }
     read-text {
         type:read-text;
         name:"Чтение текста";
         url-in {
             dataset:"Dataset 1";
         }
+    }
+    get-file-list-1 {
+        type:get-file-list;
+        name:"Список файлов 1";
+        url-in {
+            dataset:"Dataset 1";
+            file:/home/raian/liclipse/workspace/bio_project/test/scheme1.uwl;
+            file:/home/raian/liclipse/workspace/bio_project/test/scheme2.uwl;
+            dir:/home/raian/liclipse/workspace/bio_project/test/workflow_workspace;
+        }
+    }
+    write-assembly {
+        type:write-assembly;
+        name:"Запись сборки";
     }
 
     .actor-bindings {
@@ -18,12 +80,61 @@ workflow "First scheme"{
 
     .meta {
         visual {
-            read-text {
-                pos:"-691 -620";
+            fetch-sequence {
+                pos:"-677 -743";
                 style:ext;
                 bg-color-ext:"0 128 128 64";
-                bounds:"-30 -30 103 71";
+                out-sequence.angle:360;
+            }
+            get-file-list {
+                pos:"-678 -583";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                bounds:"-30 -30 40 63";
+                out-url.angle:360;
+            }
+            get-file-list-1 {
+                pos:"-787 -693";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                out-url.angle:360;
+            }
+            read-annotations {
+                pos:"-346 -564";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                out-annotations.angle:360;
+            }
+            read-msa {
+                pos:"-457 -416";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                out-msa.angle:360;
+            }
+            read-sequence {
+                pos:"-742 -565";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                bounds:"-30 -30 115.25 84";
+                out-sequence.angle:360;
+            }
+            read-text {
+                pos:"-732 -480";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
                 out-text.angle:360;
+            }
+            read-variations {
+                pos:"-601 -434";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                out-variations.angle:360;
+            }
+            write-assembly {
+                pos:"-560 -598";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                in-assembly.angle:180;
             }
         }
     }
