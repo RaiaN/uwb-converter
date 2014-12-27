@@ -13,6 +13,8 @@ def prepare_datasets(datasets):
         if len(dataset) > 1:
             for line in dataset[1:]:
                 ftype, fpath = line.strip()[:-1].split(':') #remove semicolon at the end 
+                fpath = fpath.strip('"')
+                
                 if ftype == "file":
                     files.append(fpath)
                 elif ftype == "dir":
@@ -27,6 +29,10 @@ def prepare_datasets(datasets):
 
 def add_end_indentation_line(code, count=1):  
     code += ["indentation end"] * count      
+    
+    
+def add_empty_line(code, count=1):
+    code += [""] * count    
     
     
 def files_from_dirs(dirs):
