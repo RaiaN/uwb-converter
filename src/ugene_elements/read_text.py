@@ -2,9 +2,10 @@ import utility
 
 
 class ReadText:
-    def __init__(self, name, datasets):
+    def __init__(self, name, datasets, elem_id):
         self.name     = name
         self.datasets = datasets
+        self.elem_id  = elem_id
         
         
     def generate_code(self):

@@ -1,10 +1,12 @@
 import utility
 
+
 class ReadVariations:
-    def __init__(self, name, datasets):
+    def __init__(self, name, datasets, elem_id):
         self.name     = name 
         self.datasets = datasets
         self.imports  = [] 
+        self.elem_id  = elem_id
         
     def generate_code(self):
         datasets = utility.prepare_datasets(self.datasets)
