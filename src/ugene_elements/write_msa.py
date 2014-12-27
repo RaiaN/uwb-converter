@@ -2,9 +2,9 @@ import utility
 
 
 class WriteMSA:
-    def __init__(self, name, input_data, output_path, elem_id):
+    def __init__(self, name, output_path, elem_id):
         self.name = name        
-        self.input_data = input_data
+        self.input_data = None
         self.output_path = output_path
         self.elem_id = elem_id
         self.output_dir = "biopython_data/"
