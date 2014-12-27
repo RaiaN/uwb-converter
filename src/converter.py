@@ -17,6 +17,9 @@ from write_variations import WriteVariations
 
 from merge_fastq import MergeFASTQ 
 from sequence_translation import SequenceTranslation  
+from reverse_complement import ReverseComplement
+from dna_stats import DNAStats
+
 
 class Converter:
     WORKFLOW = "workflow"
@@ -44,12 +47,13 @@ class Converter:
     
     SEQUENCE_TRANSLATION = "sequence-translation"
     REVERSE_COMPLEMENT   = "reverse-complement"
+    DNA_STATS            = "gc-content"
     
     writers = [WRITE_ANNOTATIONS, WRITE_FASTA, WRITE_MSA,
                WRITE_SEQUENCE, WRITE_VARIATIONS, WRITE_TEXT] 
     
-    ALL = readers + writers + [FETCH_SEQUENCE, MERGE_FASTQ, 
-                               SEQUENCE_TRANSLATION, REVERSE_COMPLEMENT] 
+    ALL = readers + writers + [FETCH_SEQUENCE, MERGE_FASTQ, SEQUENCE_TRANSLATION, 
+                               REVERSE_COMPLEMENT, DNA_STATS] 
     
     
     def __init__(self, scheme_filename):
@@ -248,10 +252,23 @@ class Converter:
                     ind += 1 
                     line = self.scheme[ind].strip() 
                     
-                w_elem = SequenceTranslation(elem_name, elem_id, true_elem_name)
+                w_elem = ReverseComplement(elem_name, elem_id, true_elem_name)
                  
                 self.workflow_elems.append(w_elem)     
-                elem_id += 1              
+                elem_id += 1      
+            elif elem == Converter.DNA_STATS:
+                while line != "}":
+                    if line.startswith("name"):
+                        elem_name = line.split(':')[-1].strip(';"')
+                                     
+                    ind += 1 
+                    line = self.scheme[ind].strip() 
+                    
+                w_elem = DNAStats(elem_name, elem_id, true_elem_name)
+                 
+                self.workflow_elems.append(w_elem)     
+                elem_id += 1       
+                        
         
         self.scheme = self.scheme[ind:]
               
@@ -270,14 +287,15 @@ class Converter:
             if "->" in cl:
                 sequence = [elem.split('.')[0] for elem in cl.split("->")]    
                 
-                if len(workflows) > 0 and sequence[0] == workflows[-1][-1]:
-                    workflows[-1].append(sequence[-1]) 
+                if len(workflows) > 0 and (sequence[0] in workflows[-1]): 
+                    workflows[-1].append(sequence[-1]) #continue workflow 
                 else:
                     workflows.append(sequence)
                 
             ind += 1
          
         self.workflows = workflows    
+    
     
     def build_biopython_workflow(self):
         imports = []

@@ -8,74 +8,124 @@ workflow "First scheme"{
         type:reverse-complement;
         name:"Обратная комплементарность";
     }
-    convert-text-to-sequence {
-        type:convert-text-to-sequence;
-        name:"Преобразование текста в последовательность";
-    }
-    files-conversion {
-        type:files-conversion;
-        name:"Преобразование форматов файлов";
-    }
-    convert-alignment-to-sequence {
-        type:convert-alignment-to-sequence;
-        name:"Разделение выравнивание на последовательности";
-    }
-    sequences-to-msa {
-        type:sequences-to-msa;
-        name:"Соединение последовательностей в выравнивание";
+    read-sequence {
+        type:read-sequence;
+        name:"Чтение последовательности";
+        url-in {
+            dataset:"Dataset 1";
+            file:/home/raian/ugene-1.14.2/data/samples/FASTA/human_T1.fa;
+        }
     }
     dna-stats {
         type:dna-stats;
         name:"ДНК статистика";
     }
-
-    .actor-bindings {
+    write-sequence {
+        type:write-sequence;
+        name:"Запись последовательности";
+        url-out:outp1;
+    }
+    write-annotations {
+        type:write-annotations;
+        name:"Запись аннотаций";
+        url-out:outp2;
+    }
+    reverse-complement-1 {
+        type:reverse-complement;
+        name:"Обратная комплементарность 1";
+    }
+    write-sequence-1 {
+        type:write-sequence;
+        name:"Запись последовательности";
+        url-out:outp3;
     }
 
+    .actor-bindings {
+        reverse-complement.out-sequence->write-sequence.in-sequence
+        reverse-complement.out-sequence->reverse-complement-1.in-sequence
+        read-sequence.out-sequence->reverse-complement.in-sequence
+        read-sequence.out-sequence->dna-stats.in-sequence
+        dna-stats.out-annotations->write-annotations.in-annotations
+        reverse-complement-1.out-sequence->write-sequence-1.in-sequence
+    }
+
+    read-sequence.sequence->reverse-complement.in-sequence.sequence
+    read-sequence.sequence->dna-stats.in-sequence.sequence
+    read-sequence.annotations->write-sequence.in-sequence.annotations
+    reverse-complement.sequence->write-sequence.in-sequence.sequence
+    dna-stats.annotations->write-annotations.in-annotations.annotations
+    read-sequence.annotations->write-annotations.in-annotations.annotations
+    read-sequence.sequence->write-annotations.in-annotations.sequence
+    reverse-complement.sequence->reverse-complement-1.in-sequence.sequence
+    read-sequence.annotations->write-sequence-1.in-sequence.annotations
+    reverse-complement-1.sequence->write-sequence-1.in-sequence.sequence
 
     .meta {
         visual {
-            convert-alignment-to-sequence {
-                pos:"-530 -789";
-                style:ext;
-                bg-color-ext:"0 128 128 64";
-                in-msa.angle:180;
-                out-sequence.angle:360;
-            }
-            convert-text-to-sequence {
-                pos:"-826 -757";
-                style:ext;
-                bg-color-ext:"0 128 128 64";
-                in-text.angle:180;
-                out-sequence.angle:360;
-            }
             dna-stats {
-                pos:"-455 -873";
+                pos:"-520 -798.667";
                 style:ext;
                 bg-color-ext:"0 128 128 64";
+                bounds:"-30 -30 110.75 71";
                 in-sequence.angle:180;
                 out-annotations.angle:360;
             }
-            files-conversion {
-                pos:"-544 -973";
+            read-sequence {
+                pos:"-735 -909";
                 style:ext;
                 bg-color-ext:"0 128 128 64";
-                in-file.angle:180;
-                out-file.angle:360;
+                bounds:"-30 -30 91.25 84";
+                out-sequence.angle:360;
             }
             reverse-complement {
-                pos:"-747 -928";
+                pos:"-529 -970";
                 style:ext;
                 bg-color-ext:"0 128 128 64";
                 in-sequence.angle:180;
                 out-sequence.angle:360;
             }
-            sequences-to-msa {
-                pos:"-590 -642";
+            reverse-complement-1 {
+                pos:"-373.667 -1130";
                 style:ext;
                 bg-color-ext:"0 128 128 64";
                 in-sequence.angle:180;
-                out-msa.angle:360;
+                out-sequence.angle:360;
+            }
+            write-annotations {
+                pos:"-176.667 -822.667";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                in-annotations.angle:180;
+            }
+            write-sequence {
+                pos:"-180 -960";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                in-sequence.angle:180;
+            }
+            write-sequence-1 {
+                pos:"-179.333 -1110.67";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                in-sequence.angle:180;
+            }
+            dna-stats.out-annotations->write-annotations.in-annotations {
+                text-pos:"-50 -45";
+            }
+            read-sequence.out-sequence->dna-stats.in-sequence {
+                text-pos:"-54.3281 -23";
+            }
+            read-sequence.out-sequence->reverse-complement.in-sequence {
+                text-pos:"-52.3281 -27";
+            }
+            reverse-complement-1.out-sequence->write-sequence-1.in-sequence {
+                text-pos:"-53.8828 -35";
+            }
+            reverse-complement.out-sequence->reverse-complement-1.in-sequence {
+                text-pos:"-53.8828 -35";
+            }
+            reverse-complement.out-sequence->write-sequence.in-sequence {
+                text-pos:"-53.8828 -35";
             }
         }
     }
