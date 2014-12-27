@@ -1,140 +1,113 @@
 #@UGENE_WORKFLOW
 
 
+
 workflow "First scheme"{
 
-    fetch-sequence {
-        type:fetch-sequence;
-        name:"Загрузить из удаленной базы данных";
-        resource-id:ewqe;
-    }
-    get-file-list {
-        type:get-file-list;
-        name:"Список файлов";
+    read-sequence {
+        type:read-sequence;
+        name:"Чтение последовательности";
         url-in {
             dataset:"Dataset 1";
+            dir:/home/raian/flux/debian;
         }
+    }
+    write-annotations {
+        type:write-annotations;
+        name:"Запись аннотаций";
+        url-out:gfg;
     }
     read-annotations {
         type:read-annotations;
         name:"Чтение аннотаций";
         url-in {
             dataset:"Dataset 1";
-            file:/home/raian/eqwe.uwl;
-            file:/home/raian/nohup.out;
-            file:"/home/raian/System Report.txt";
-            dir:/home/raian/eclipse;
-        }
-        url-in {
-            dataset:"Dataset 2";
-            dir:/home/raian/eclipse/p2;
-            file:/home/raian/algo-hw-4.pdf;
+            file:/home/raian/ugene-1.14.2/data/samples/Genbank/NC_014267.1.gb;
         }
     }
-    read-variations {
-        type:read-variations;
-        name:"Чтение вариаций";
-        url-in {
-            dataset:"Dataset 1";
-        }
+    write-msa {
+        type:write-msa;
+        name:"Запись множественного выравнивания";
     }
-    read-msa {
-        type:read-msa;
-        name:"Чтение множественного выравнивания";
-        url-in {
-            dataset:"Dataset 1";
-        }
+    write-variations {
+        type:write-variations;
+        name:"Запись вариаций";
     }
-    read-sequence {
-        type:read-sequence;
-        name:"Чтение последовательности";
-        url-in {
-            dataset:"Dataset 1";
-        }
+    write-sequence {
+        type:write-sequence;
+        name:"Запись последовательности";
+        url-out:ffg;
     }
-    read-text {
-        type:read-text;
-        name:"Чтение текста";
-        url-in {
-            dataset:"Dataset 1";
-        }
+    write-text {
+        type:write-text;
+        name:"Запись текста";
     }
-    get-file-list-1 {
-        type:get-file-list;
-        name:"Список файлов 1";
-        url-in {
-            dataset:"Dataset 1";
-            file:/home/raian/liclipse/workspace/bio_project/test/scheme1.uwl;
-            file:/home/raian/liclipse/workspace/bio_project/test/scheme2.uwl;
-            dir:/home/raian/liclipse/workspace/bio_project/test/workflow_workspace;
-        }
-    }
-    write-assembly {
-        type:write-assembly;
-        name:"Запись сборки";
+    write-sequence-1 {
+        type:write-sequence;
+        name:"Запись последовательности 1";
     }
 
     .actor-bindings {
+        read-annotations.out-annotations->write-annotations.in-annotations
     }
 
+    read-annotations.annotations->write-annotations.in-annotations.annotations
 
     .meta {
         visual {
-            fetch-sequence {
-                pos:"-677 -743";
-                style:ext;
-                bg-color-ext:"0 128 128 64";
-                out-sequence.angle:360;
-            }
-            get-file-list {
-                pos:"-678 -583";
-                style:ext;
-                bg-color-ext:"0 128 128 64";
-                bounds:"-30 -30 40 63";
-                out-url.angle:360;
-            }
-            get-file-list-1 {
-                pos:"-787 -693";
-                style:ext;
-                bg-color-ext:"0 128 128 64";
-                out-url.angle:360;
-            }
             read-annotations {
-                pos:"-346 -564";
+                pos:"-861 -509";
                 style:ext;
                 bg-color-ext:"0 128 128 64";
+                bounds:"-30 -30 94.25 60";
                 out-annotations.angle:360;
             }
-            read-msa {
-                pos:"-457 -416";
-                style:ext;
-                bg-color-ext:"0 128 128 64";
-                out-msa.angle:360;
-            }
             read-sequence {
-                pos:"-742 -565";
+                pos:"-866 -647";
                 style:ext;
                 bg-color-ext:"0 128 128 64";
-                bounds:"-30 -30 115.25 84";
+                bounds:"-30 -30 101.25 82";
                 out-sequence.angle:360;
             }
-            read-text {
-                pos:"-732 -480";
+            write-annotations {
+                pos:"-459 -526";
                 style:ext;
                 bg-color-ext:"0 128 128 64";
-                out-text.angle:360;
+                in-annotations.angle:180;
             }
-            read-variations {
-                pos:"-601 -434";
+            write-msa {
+                pos:"-857 -802";
                 style:ext;
                 bg-color-ext:"0 128 128 64";
-                out-variations.angle:360;
+                in-msa.angle:180;
             }
-            write-assembly {
-                pos:"-560 -598";
+            write-sequence {
+                pos:"-617 -702";
                 style:ext;
                 bg-color-ext:"0 128 128 64";
-                in-assembly.angle:180;
+                in-sequence.angle:180;
+            }
+            write-sequence-1 {
+                pos:"-469 -671";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                in-sequence.angle:180;
+            }
+            write-text {
+                pos:"-592 -528";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                in-text.angle:180;
+            }
+            write-variations {
+                pos:"-622 -829";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                bounds:"-30 -30 219.75 81";
+                in-variations.angle:180;
+            }
+            read-annotations.out-annotations->write-annotations.in-annotations {
+                text-pos:"-31.4766 -70";
             }
         }
     }
