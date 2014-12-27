@@ -47,11 +47,13 @@ def main():
         if line != "indentation end":
             result += four_spaces * indentation + line + "\n"
 
-            if line.startswith("for") or line.startswith("if") or line.startswith("with"):
-                indentation += 1
+            indent = line.startswith("for ")
+            indent = indent or line.startswith("if ")
+            indent = indent or line.startswith("with ")
+
+            indentation += indent
         else:
             indentation -= 1
-
 
 
     with open(scheme_filename[:-3] + "py", "w") as outp:
