@@ -1,11 +1,19 @@
 import re
 from fetch_sequence import FetchSequence
+
 from get_file_list import GetFileList
 from read_annotations import ReadAnnotations
 from read_msa import ReadMSA
 from read_sequence import ReadSequence
 from read_text import ReadText
 from read_variations import ReadVariations
+
+from write_annotations import WriteAnnotations
+from write_fasta import WriteFasta
+from write_msa import WriteMSA
+from write_sequence import WriteSequence
+from write_text import WriteText
+from write_variations import WriteVariations 
 
 
 class Converter:
@@ -161,9 +169,40 @@ class Converter:
                     w_elem = ReadVariations(elem_name, datasets, elem_id)  
                     
                 self.workflow_elems.append(w_elem)     
-                elem_id += 1        
+                elem_id += 1      
+                  
             elif elem in Converter.writers:
-                pass    
+                url_out = None
+                
+                while line != "}":
+                    if line.startswith("name"):
+                        elem_name = line.split(':')[-1].strip(';"') 
+                    elif line.startswith("url-out"):
+                        url_out = line.split(':')[-1].strip(';"')
+                                         
+                    ind += 1 
+                    line = self.scheme[ind].strip()  
+                    
+                if elem == Converter.WRITE_ANNOTATIONS:
+                    w_elem = WriteAnnotations(elem_name, url_out, elem_id) 
+                    
+                elif elem == Converter.WRITE_FASTA: 
+                    w_elem = WriteFasta(elem_name, url_out, elem_id) 
+                    
+                elif elem == Converter.WRITE_MSA:
+                    w_elem = WriteMSA(elem_name, url_out, elem_id)  
+                    
+                elif elem == Converter.WRITE_SEQUENCE:
+                    w_elem = WriteSequence(elem_name, url_out, elem_id) 
+                    
+                elif elem == Converter.WRITE_TEXT:
+                    w_elem = WriteText(elem_name, url_out, elem_id)  
+                    
+                elif elem == Converter.WRITE_VARIATIONS:  
+                    w_elem = WriteVariations(elem_name, url_out, elem_id) 
+                    
+                self.workflow_elems.append(w_elem)     
+                elem_id += 1            
         
         self.scheme = self.scheme[ind:]
               
