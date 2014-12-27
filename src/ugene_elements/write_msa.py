@@ -15,7 +15,7 @@ class WriteMSA:
     def generate_code(self):
         code = []
         
-        if self.input_data is None:
+        if self.input_data is None or self.output_path is None:
             self.code = code
             return
         

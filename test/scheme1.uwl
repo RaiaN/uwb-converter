@@ -4,110 +4,78 @@
 
 workflow "First scheme"{
 
-    read-sequence {
-        type:read-sequence;
-        name:"Чтение последовательности";
-        url-in {
-            dataset:"Dataset 1";
-            dir:/home/raian/flux/debian;
-        }
+    reverse-complement {
+        type:reverse-complement;
+        name:"Обратная комплементарность";
     }
-    write-annotations {
-        type:write-annotations;
-        name:"Запись аннотаций";
-        url-out:gfg;
+    convert-text-to-sequence {
+        type:convert-text-to-sequence;
+        name:"Преобразование текста в последовательность";
     }
-    read-annotations {
-        type:read-annotations;
-        name:"Чтение аннотаций";
-        url-in {
-            dataset:"Dataset 1";
-            file:/home/raian/ugene-1.14.2/data/samples/Genbank/NC_014267.1.gb;
-        }
+    files-conversion {
+        type:files-conversion;
+        name:"Преобразование форматов файлов";
     }
-    write-msa {
-        type:write-msa;
-        name:"Запись множественного выравнивания";
+    convert-alignment-to-sequence {
+        type:convert-alignment-to-sequence;
+        name:"Разделение выравнивание на последовательности";
     }
-    write-variations {
-        type:write-variations;
-        name:"Запись вариаций";
+    sequences-to-msa {
+        type:sequences-to-msa;
+        name:"Соединение последовательностей в выравнивание";
     }
-    write-sequence {
-        type:write-sequence;
-        name:"Запись последовательности";
-        url-out:ffg;
-    }
-    write-text {
-        type:write-text;
-        name:"Запись текста";
-    }
-    write-sequence-1 {
-        type:write-sequence;
-        name:"Запись последовательности 1";
+    dna-stats {
+        type:dna-stats;
+        name:"ДНК статистика";
     }
 
     .actor-bindings {
-        read-annotations.out-annotations->write-annotations.in-annotations
     }
 
-    read-annotations.annotations->write-annotations.in-annotations.annotations
 
     .meta {
         visual {
-            read-annotations {
-                pos:"-861 -509";
-                style:ext;
-                bg-color-ext:"0 128 128 64";
-                bounds:"-30 -30 94.25 60";
-                out-annotations.angle:360;
-            }
-            read-sequence {
-                pos:"-866 -647";
-                style:ext;
-                bg-color-ext:"0 128 128 64";
-                bounds:"-30 -30 101.25 82";
-                out-sequence.angle:360;
-            }
-            write-annotations {
-                pos:"-459 -526";
-                style:ext;
-                bg-color-ext:"0 128 128 64";
-                in-annotations.angle:180;
-            }
-            write-msa {
-                pos:"-857 -802";
+            convert-alignment-to-sequence {
+                pos:"-530 -789";
                 style:ext;
                 bg-color-ext:"0 128 128 64";
                 in-msa.angle:180;
+                out-sequence.angle:360;
             }
-            write-sequence {
-                pos:"-617 -702";
-                style:ext;
-                bg-color-ext:"0 128 128 64";
-                in-sequence.angle:180;
-            }
-            write-sequence-1 {
-                pos:"-469 -671";
-                style:ext;
-                bg-color-ext:"0 128 128 64";
-                in-sequence.angle:180;
-            }
-            write-text {
-                pos:"-592 -528";
+            convert-text-to-sequence {
+                pos:"-826 -757";
                 style:ext;
                 bg-color-ext:"0 128 128 64";
                 in-text.angle:180;
+                out-sequence.angle:360;
             }
-            write-variations {
-                pos:"-622 -829";
+            dna-stats {
+                pos:"-455 -873";
                 style:ext;
                 bg-color-ext:"0 128 128 64";
-                bounds:"-30 -30 219.75 81";
-                in-variations.angle:180;
+                in-sequence.angle:180;
+                out-annotations.angle:360;
             }
-            read-annotations.out-annotations->write-annotations.in-annotations {
-                text-pos:"-31.4766 -70";
+            files-conversion {
+                pos:"-544 -973";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                in-file.angle:180;
+                out-file.angle:360;
+            }
+            reverse-complement {
+                pos:"-747 -928";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                in-sequence.angle:180;
+                out-sequence.angle:360;
+            }
+            sequences-to-msa {
+                pos:"-590 -642";
+                style:ext;
+                bg-color-ext:"0 128 128 64";
+                in-sequence.angle:180;
+                out-msa.angle:360;
             }
         }
     }

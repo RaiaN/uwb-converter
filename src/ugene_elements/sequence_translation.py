@@ -21,11 +21,12 @@ class SequenceTranslation:
         line = '# ' + self.name
         code.append(line)
         
-        self.output = "translated_seqs" + str(self.elem_id)   
+        self.output = "translated_seqs" + str(self.elem_id)           
         
         line = '%s = []' % self.output 
+        code.append(line)
         
-        line = 'for record in %s' % self.input_data
+        line = 'for record in %s:' % self.input_data
         code.append(line)
         
         line = '%s.append(record.seq.translate())' % self.output
