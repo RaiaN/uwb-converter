@@ -40,12 +40,24 @@ class Converter:
     readers = [READ_ANNOTATIONS, READ_MSA, READ_SEQUENCE, 
                READ_TEXT, READ_VARIATIONS]
     
+    readers_dict = {GET_FILE_LIST: GetFileList, 
+                    READ_ANNOTATIONS: ReadAnnotations, READ_MSA: ReadMSA, 
+                    READ_SEQUENCE: ReadSequence, READ_TEXT: ReadText,
+                    READ_VARIATIONS: ReadVariations}
+    
     WRITE_ANNOTATIONS = "write-annotations"
     WRITE_FASTA       = "write-fasta"
     WRITE_MSA         = "write-msa"
     WRITE_SEQUENCE    = "write-sequence"
     WRITE_VARIATIONS  = "write-variations"
     WRITE_TEXT        = "write-text"
+    
+    writers = [WRITE_ANNOTATIONS, WRITE_FASTA, WRITE_MSA,
+               WRITE_SEQUENCE, WRITE_VARIATIONS, WRITE_TEXT] 
+    
+    writers_dict = {WRITE_ANNOTATIONS: WriteAnnotations, WRITE_FASTA: WriteFasta,
+                    WRITE_MSA: WriteMSA, WRITE_SEQUENCE: WriteSequence, 
+                    WRITE_VARIATIONS: WriteVariations, WRITE_TEXT: WriteText}
     
     MERGE_FASTQ       = "MergeFastq"
     
@@ -55,8 +67,7 @@ class Converter:
     
     CONVERT_ALIGNMENT_TO_SEQUENCE = "convert-alignment-to-sequence"
     
-    writers = [WRITE_ANNOTATIONS, WRITE_FASTA, WRITE_MSA,
-               WRITE_SEQUENCE, WRITE_VARIATIONS, WRITE_TEXT] 
+    
     
     ALL = readers + writers + [FETCH_SEQUENCE, MERGE_FASTQ, 
                                SEQUENCE_TRANSLATION, REVERSE_COMPLEMENT, 
@@ -101,199 +112,249 @@ class Converter:
         self.scheme = self.scheme[1:]       
     
     
+    def add_fetch_sequence(self, ind, elem_id, true_elem_name):
+        db_name = "ncbi"  #default db
+        
+        line = self.scheme[ind].strip()
+                 
+        while line != "}":
+            if line.startswith("name"):
+                elem_name = line.split(':')[-1].strip(';"')
+            elif line.startswith("database"):
+                db_name = line.split(':')[-1].strip(';"')       
+            elif line.startswith("resource-id"):
+                resource_ids = line.split(':')[-1].strip(';"')   
+                
+            ind += 1 
+            line = self.scheme[ind].strip() 
+            
+        fs = FetchSequence(elem_name, db_name, resource_ids, elem_id, true_elem_name)    
+                
+        self.workflow_elems.append(fs)     
+        elem_id += 1  
+            
+        return ind, elem_id   
+    
+    
+    def add_reader(self, ind, elem, elem_id, true_elem_name):
+        datasets = []
+        
+        line = self.scheme[ind].strip()
+                
+        while line != "}":
+            if line.startswith("name"):
+                elem_name = line.split(':')[-1].strip(';"') 
+            elif line.startswith("url-in"):
+                dataset = []
+                
+                ind += 1 
+                line = self.scheme[ind].strip() 
+                
+                while line != "}":
+                    dataset.append(line)     
+                    
+                    ind += 1
+                    line = self.scheme[ind].strip() 
+                
+                datasets.append(dataset) 
+                
+            ind += 1 
+            line = self.scheme[ind].strip() 
+            
+        reader_cls = Converter.readers_dict[elem]
+        w_elem = reader_cls(elem_name, datasets, elem_id, true_elem_name) 
+            
+        self.workflow_elems.append(w_elem)     
+        elem_id += 1           
+            
+        return ind, elem_id    
+      
+    
+    def add_writer_info(self, ind, elem, elem_id, true_elem_name):
+        url_out = None
+        
+        line = self.scheme[ind].strip()
+                
+        while line != "}":
+            if line.startswith("name"):
+                elem_name = line.split(':')[-1].strip(';"') 
+            elif line.startswith("url-out"):
+                url_out = line.split(':')[-1].strip(';"')
+                                 
+            ind += 1 
+            line = self.scheme[ind].strip()
+            
+        writer_cls = Converter.writers_dict[elem]
+        w_elem = writer_cls(elem_name, url_out, elem_id, true_elem_name)
+        
+        self.workflow_elems.append(w_elem)     
+        elem_id += 1  
+            
+        return ind, elem_id  
+    
+    
+    def add_merge_fastq(self, ind, elem_id, true_elem_name):
+        line = self.scheme[ind].strip()
+        
+        while line != "}":
+            if line.startswith("name"):
+                elem_name = line.split(':')[-1].strip(';"')
+                             
+            ind += 1 
+            line = self.scheme[ind].strip()
+        
+        w_elem = MergeFASTQ(elem_name, elem_id, true_elem_name)
+        
+        self.workflow_elems.append(w_elem)     
+        elem_id += 1 
+        
+        return ind, elem_id  
+    
+        
+    def add_sequence_translation(self, ind, elem_id, true_elem_name):
+        line = self.scheme[ind].strip()
+        
+        while line != "}":
+            if line.startswith("name"):
+                elem_name = line.split(':')[-1].strip(';"')
+                             
+            ind += 1 
+            line = self.scheme[ind].strip()
+        
+        w_elem = SequenceTranslation(elem_name, elem_id, true_elem_name)
+        
+        self.workflow_elems.append(w_elem)     
+        elem_id += 1 
+        
+        return ind, elem_id  
+    
+        
+    def add_reverse_complement(self, ind, elem_id, true_elem_name):
+        line = self.scheme[ind].strip()
+        
+        while line != "}":
+            if line.startswith("name"):
+                elem_name = line.split(':')[-1].strip(';"')
+                             
+            ind += 1 
+            line = self.scheme[ind].strip()
+        
+        w_elem = ReverseComplement(elem_name, elem_id, true_elem_name)
+        
+        self.workflow_elems.append(w_elem)     
+        elem_id += 1   
+        
+        return ind, elem_id  
+     
+        
+    def add_dna_stats(self, ind, elem_id, true_elem_name): 
+        line = self.scheme[ind].strip()
+                
+        while line != "}":
+            if line.startswith("name"):
+                elem_name = line.split(':')[-1].strip(';"')
+                             
+            ind += 1 
+            line = self.scheme[ind].strip() 
+            
+        w_elem = DNAStats(elem_name, elem_id, true_elem_name)
+         
+        self.workflow_elems.append(w_elem)     
+        elem_id += 1    
+        
+        return ind, elem_id 
+    
+    
+    def add_convert_alignment_to_seq(self, ind, elem_id, true_elem_name):
+        line = self.scheme[ind].strip()
+                
+        while line != "}":
+            if line.startswith("name"):
+                elem_name = line.split(':')[-1].strip(';"')
+                             
+            ind += 1 
+            line = self.scheme[ind].strip() 
+            
+        w_elem = ConvertAlignmentToSequence(elem_name, elem_id, true_elem_name)
+         
+        self.workflow_elems.append(w_elem)     
+        elem_id += 1    
+        
+        return ind, elem_id 
+    
+    
+    def try_for_element(self, ind):
+        cl = self.scheme[ind]  
+        
+        if cl.lstrip().startswith(".actor-bindings"):
+            ind += 1               
+            return [ind, "break"]
+        
+        if "{" not in cl:
+            ind += 1
+            return [ind, "continue"]
+        
+        line = cl.split('{')[0].strip()
+        true_elem_name = line
+        
+        numeric = re.compile(r'[\d]+')
+        line    = numeric.sub('', line)
+        elem    = line.rstrip("-") #elem name without numbers
+        
+        if elem not in Converter.ALL:
+            print("Element %s is not supported yet")
+            ind += 1
+            
+            return [ind, "continue"]
+        
+        return [ind, elem, true_elem_name]   
+                  
+    
     def parse_for_elements(self):
         ind = 0
-        
-        self.workflow_elems = []
         elem_id = 0
         
+        self.workflow_elems = []
+        
         while ind < len(self.scheme):
-            cl = self.scheme[ind]  
+            res = self.try_for_element(ind)
             
-            if cl.lstrip().startswith(".actor-bindings"):
-                ind += 1               
+            if res[1] == "break":
                 break
-            
-            if "{" not in cl:
-                ind += 1
+            elif res[1] == "continue":
+                ind = res[0]
                 continue
             
-            line = cl.split('{')[0].strip()
-            true_elem_name = line
-            
-            numeric = re.compile(r'[\d]+')
-            line    = numeric.sub('', line)
-            elem    = line.rstrip("-") #elem name without numbers
-            
-            if elem not in Converter.ALL:
-                print("Element %s is not supported yet")
-                ind += 1
-                continue    
+            ind            = res[0]
+            elem           = res[1]
+            true_elem_name = res[2]
             
             ind += 1
-            line = self.scheme[ind].strip()
                              
             if elem == Converter.FETCH_SEQUENCE:
-                db_name = "ncbi"  #default db
+                ind, elem_id = self.add_fetch_sequence(ind, elem_id, true_elem_name)
                 
-                while line != "}":
-                    if line.startswith("name"):
-                        elem_name = line.split(':')[-1].strip(';"')
-                    elif line.startswith("database"):
-                        db_name = line.split(':')[-1].strip(';"')       
-                    elif line.startswith("resource-id"):
-                        resource_ids = line.split(':')[-1].strip(';"')   
-                        
-                    ind += 1 
-                    line = self.scheme[ind].strip()    
-                
-                fs = FetchSequence(elem_name, resource_ids, db_name, elem_id, true_elem_name)    
-                
-                self.workflow_elems.append(fs)     
-                elem_id += 1    
-                        
             elif elem in Converter.readers:
-                datasets = []
-                
-                while line != "}":
-                    if line.startswith("name"):
-                        elem_name = line.split(':')[-1].strip(';"') 
-                    elif line.startswith("url-in"):
-                        dataset = []
-                        
-                        ind += 1 
-                        line = self.scheme[ind].strip() 
-                        
-                        while line != "}":
-                            dataset.append(line)     
-                            
-                            ind += 1
-                            line = self.scheme[ind].strip() 
-                        
-                        datasets.append(dataset) 
-                        
-                    ind += 1 
-                    line = self.scheme[ind].strip()  
-                 
-                if elem == Converter.GET_FILE_LIST:
-                    w_elem = GetFileList(elem_name, datasets, elem_id, true_elem_name) 
-                    
-                elif elem == Converter.READ_ANNOTATIONS: 
-                    w_elem = ReadAnnotations(elem_name, datasets, elem_id, true_elem_name)
-                    
-                elif elem == Converter.READ_MSA:
-                    w_elem = ReadMSA(elem_name, datasets, elem_id, true_elem_name) 
-                    
-                elif elem == Converter.READ_SEQUENCE:
-                    w_elem = ReadSequence(elem_name, datasets, elem_id, true_elem_name)
-                    
-                elif elem == Converter.READ_TEXT:
-                    w_elem = ReadText(elem_name, datasets, elem_id, true_elem_name)  
-                    
-                elif elem == Converter.READ_VARIATIONS:  
-                    w_elem = ReadVariations(elem_name, datasets, elem_id, true_elem_name)  
-                    
-                self.workflow_elems.append(w_elem)     
-                elem_id += 1      
-                  
+                ind, elem_id = self.add_reader(ind, elem, elem_id, true_elem_name)
+                                  
             elif elem in Converter.writers:
-                url_out = None
-                
-                while line != "}":
-                    if line.startswith("name"):
-                        elem_name = line.split(':')[-1].strip(';"') 
-                    elif line.startswith("url-out"):
-                        url_out = line.split(':')[-1].strip(';"')
-                                         
-                    ind += 1 
-                    line = self.scheme[ind].strip()  
-                    
-                if elem == Converter.WRITE_ANNOTATIONS:
-                    w_elem = WriteAnnotations(elem_name, url_out, elem_id, true_elem_name) 
-                    
-                elif elem == Converter.WRITE_FASTA: 
-                    w_elem = WriteFasta(elem_name, url_out, elem_id, true_elem_name) 
-                    
-                elif elem == Converter.WRITE_MSA:
-                    w_elem = WriteMSA(elem_name, url_out, elem_id, true_elem_name)  
-                    
-                elif elem == Converter.WRITE_SEQUENCE:
-                    w_elem = WriteSequence(elem_name, url_out, elem_id, true_elem_name) 
-                    
-                elif elem == Converter.WRITE_TEXT:
-                    w_elem = WriteText(elem_name, url_out, elem_id, true_elem_name)  
-                    
-                elif elem == Converter.WRITE_VARIATIONS:  
-                    w_elem = WriteVariations(elem_name, url_out, elem_id, true_elem_name) 
-                    
-                self.workflow_elems.append(w_elem)     
-                elem_id += 1  
+                ind, elem_id = self.add_writer_info(ind, elem, elem_id, true_elem_name)
                 
             elif elem == Converter.MERGE_FASTQ:
-                while line != "}":
-                    if line.startswith("name"):
-                        elem_name = line.split(':')[-1].strip(';"')
-                                     
-                    ind += 1 
-                    line = self.scheme[ind].strip()
-                
-                w_elem = MergeFASTQ(elem_name, elem_id, true_elem_name)
-                
-                self.workflow_elems.append(w_elem)     
-                elem_id += 1 
+                ind, elem_id = self.add_merge_fastq(ind, elem_id, true_elem_name)
                         
             elif elem == Converter.SEQUENCE_TRANSLATION:
-                while line != "}":
-                    if line.startswith("name"):
-                        elem_name = line.split(':')[-1].strip(';"')
-                                     
-                    ind += 1 
-                    line = self.scheme[ind].strip()
-                
-                w_elem = SequenceTranslation(elem_name, elem_id, true_elem_name)
-                 
-                self.workflow_elems.append(w_elem)     
-                elem_id += 1  
+                ind, elem_id = self.add_sequence_translation(ind, elem_id, true_elem_name)
                 
             elif elem == Converter.REVERSE_COMPLEMENT:
-                while line != "}":
-                    if line.startswith("name"):
-                        elem_name = line.split(':')[-1].strip(';"')
-                                     
-                    ind += 1 
-                    line = self.scheme[ind].strip() 
-                    
-                w_elem = ReverseComplement(elem_name, elem_id, true_elem_name)
-                 
-                self.workflow_elems.append(w_elem)     
-                elem_id += 1     
+                ind, elem_id = self.add_reverse_complement(ind, elem_id, true_elem_name)                
                  
             elif elem == Converter.DNA_STATS:
-                while line != "}":
-                    if line.startswith("name"):
-                        elem_name = line.split(':')[-1].strip(';"')
-                                     
-                    ind += 1 
-                    line = self.scheme[ind].strip() 
-                    
-                w_elem = DNAStats(elem_name, elem_id, true_elem_name)
-                 
-                self.workflow_elems.append(w_elem)     
-                elem_id += 1     
+                ind, elem_id = self.add_dna_stats(ind, elem_id, true_elem_name) 
                   
             elif elem == Converter.CONVERT_ALIGNMENT_TO_SEQUENCE:
-                while line != "}":
-                    if line.startswith("name"):
-                        elem_name = line.split(':')[-1].strip(';"')
-                                     
-                    ind += 1 
-                    line = self.scheme[ind].strip() 
-                    
-                w_elem = ConvertAlignmentToSequence(elem_name, elem_id, true_elem_name)
-                 
-                self.workflow_elems.append(w_elem)     
-                elem_id += 1                  
-        
+                ind, elem_id = self.add_convert_alignment_to_seq(ind, elem_id, true_elem_name)               
+                
         self.scheme = self.scheme[ind:]
               
    

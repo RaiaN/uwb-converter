@@ -1,29 +1,51 @@
 #!/bin/env python3
+import sys 
+sys.path.append('ugene_elements')
 
 __author__ = "Peter Leontev"
 
-import cmd_parser
 import converter
 
+from argparse import ArgumentParser
+
+
+def create_parser():
+    parser = ArgumentParser(description="Convert workflow scheme")
+    parser.add_argument("-scheme", help = ".uwl workflow scheme filename")
+    
+    return parser
+
+def show_usage():
+    print('Please, use -scheme option to set UGENE workflow scheme, e.g. "-scheme test.uwl"')
+    
+
+def get_args(parser):
+    args = parser.parse_args()
+    
+    return args.scheme
+
+
 def main():
-    parser_obj = cmd_parser.create()
-    arg       = cmd_parser.get_args(parser_obj)    
+    parser_obj = create_parser()
+    arg        = get_args(parser_obj)    
     
     if arg == None:
-        cmd_parser.usage()
+        show_usage()
         return 0
     
     scheme_filename = arg
     
     converter_obj = converter.Converter(scheme_filename)
     code = converter_obj.convert()
+    
+    four_spaces = "" * 4
           
     with open(scheme_filename[:-3] + "py", "w") as outp: 
         indentation = 0         
             
         for line in code:
             if line != "indentation end":
-                outp.write("    " * indentation + line + "\n")
+                outp.write(four_spaces * indentation + line + "\n")
                 
                 if line.startswith("for") or line.startswith("if") or line.startswith("with"):
                     indentation += 1  
