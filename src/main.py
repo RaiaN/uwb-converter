@@ -11,7 +11,7 @@ from argparse import ArgumentParser
 
 def create_parser():
     parser = ArgumentParser(description="Convert workflow scheme")
-    parser.add_argument("-scheme", help = ".uwl workflow scheme filename")
+    parser.add_argument("-scheme", help=".uwl workflow scheme filename")
 
     return parser
 
@@ -27,7 +27,7 @@ def get_args(parser):
 
 def main():
     parser_obj = create_parser()
-    arg        = get_args(parser_obj)
+    arg = get_args(parser_obj)
 
     if arg == None:
         show_usage()
