@@ -1,7 +1,7 @@
 import utility
 
 
-class ConvertAlignmentToSequence:
+class ConvertAlignmentToSequence(object):
     def __init__(self, name, elem_id, true_elem_name):
         self.name = name
         self.input_data = None
